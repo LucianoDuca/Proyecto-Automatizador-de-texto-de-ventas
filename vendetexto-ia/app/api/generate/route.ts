@@ -4,7 +4,7 @@ export async function POST(req: Request) {
   try {
     const { product, audience, tone, price } = await req.json();
 
-    if (!product || !audience || !tone || !price) {
+    if (!product || !audience || !price) {
       return NextResponse.json(
         { error: "Faltan datos obligatorios" },
         { status: 400 }
@@ -12,39 +12,38 @@ export async function POST(req: Request) {
     }
 
     const prompt = `
-Sos un experto en ventas, marketing digital y copywriting para negocios de Argentina.
+Sos un experto en ventas, copywriting y publicaciones de alto rendimiento en MercadoLibre Argentina.
 
-Generá contenido para vender este producto:
+Tu objetivo NO es solo describir el producto, sino hacerlo irresistible para comprar.
 
 Producto: ${product}
 Público objetivo: ${audience}
 Precio: ${price}
 Tono: ${tone}
 
-REGLAS IMPORTANTES:
-- Usá español argentino natural.
-- No uses "quieres", usá "querés".
-- No inventes links, URLs, números de WhatsApp ni redes sociales.
+REGLAS:
+- Escribí como un vendedor que quiere cerrar la venta.
+- Enfocate en beneficios reales: qué gana el cliente.
+- Usá lenguaje claro, directo y persuasivo.
+- Generá confianza sin mentir.
+- Usá pequeños disparadores de urgencia o valor.
+- No inventes marca, modelo, stock, garantía real, envío gratis ni datos técnicos si no fueron dados.
+- Si falta información técnica, usá frases generales pero útiles.
+- El título debe estar optimizado para búsqueda en MercadoLibre.
 - No dejes campos vacíos.
-- El texto de Instagram debe parecer una publicación real.
-- El mensaje de WhatsApp debe parecer un mensaje real para enviarle a un cliente.
-- Los hashtags deben empezar con #.
-- El precio debe aparecer de forma natural cuando tenga sentido.
 
 Respondé SOLO con JSON válido.
-No agregues explicaciones.
 No uses markdown.
+No agregues explicaciones.
 No uses comillas triples.
 
 Estructura exacta:
-
 {
   "titulo": "",
-  "descripcion_corta": "",
-  "descripcion_larga": "",
-  "texto_instagram": "",
-  "mensaje_whatsapp": "",
-  "hashtags": []
+  "descripcion": "",
+  "caracteristicas": [],
+  "beneficios": [],
+  "info_adicional": ""
 }
 `;
 

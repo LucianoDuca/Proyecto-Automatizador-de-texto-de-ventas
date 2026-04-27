@@ -1,0 +1,9 @@
+
+node_modules/
+.next/
+**/node_modules/
+**/.next/
+.env.local
+.env*
+vendetexto-ia/node_modules/
+vendetexto-ia/.next/
