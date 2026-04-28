@@ -2,9 +2,18 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { product, audience, tone, price } = await req.json();
+    const {
+      product,
+      audience,
+      tone,
+      price,
+      details,
+      condition,
+      category,
+      brand,
+    } = await req.json();
 
-    if (!product || !audience || !tone || !price) {
+    if (!product || !audience || !price || !details) {
       return NextResponse.json(
         { error: "Faltan datos obligatorios" },
         { status: 400 }
@@ -12,39 +21,45 @@ export async function POST(req: Request) {
     }
 
     const prompt = `
-Sos un experto en ventas, marketing digital y copywriting para negocios de Argentina.
+Sos un experto en ventas, SEO y publicaciones de alto rendimiento en MercadoLibre Argentina.
 
-Generá contenido para vender este producto:
+Generá una publicación optimizada para vender este producto en MercadoLibre Argentina.
 
+DATOS DEL PRODUCTO:
 Producto: ${product}
+Marca: ${brand || "No especificada"}
+Categoría: ${category || "No especificada"}
+Estado: ${condition || "No especificado"}
 Público objetivo: ${audience}
 Precio: ${price}
 Tono: ${tone}
+Detalles reales del producto: ${details}
 
-REGLAS IMPORTANTES:
+OBJETIVO:
+Crear una publicación clara, confiable y orientada a venta.
+
+REGLAS:
 - Usá español argentino natural.
-- No uses "quieres", usá "querés".
-- No inventes links, URLs, números de WhatsApp ni redes sociales.
+- El título debe estar optimizado para búsqueda en MercadoLibre.
+- No inventes marca, modelo, garantía, stock, envío gratis, cuotas ni datos técnicos.
+- Usá únicamente la información dada.
+- Si falta información, redactá de forma general pero profesional.
+- Las características deben ser concretas.
+- Los beneficios deben explicar por qué conviene comprarlo.
+- La descripción debe generar confianza y deseo de compra.
 - No dejes campos vacíos.
-- El texto de Instagram debe parecer una publicación real.
-- El mensaje de WhatsApp debe parecer un mensaje real para enviarle a un cliente.
-- Los hashtags deben empezar con #.
-- El precio debe aparecer de forma natural cuando tenga sentido.
 
 Respondé SOLO con JSON válido.
-No agregues explicaciones.
 No uses markdown.
-No uses comillas triples.
+No agregues explicaciones.
 
 Estructura exacta:
-
 {
   "titulo": "",
-  "descripcion_corta": "",
-  "descripcion_larga": "",
-  "texto_instagram": "",
-  "mensaje_whatsapp": "",
-  "hashtags": []
+  "descripcion": "",
+  "caracteristicas": [],
+  "beneficios": [],
+  "info_adicional": ""
 }
 `;
 
@@ -69,7 +84,7 @@ Estructura exacta:
               content: prompt,
             },
           ],
-          temperature: 0.7,
+          temperature: 0.6,
         }),
       }
     );

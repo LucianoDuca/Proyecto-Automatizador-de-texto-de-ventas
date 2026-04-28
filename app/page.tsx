@@ -7,15 +7,18 @@ type FormData = {
   audience: string;
   tone: string;
   price: string;
+  details: string;
+  condition: string;
+  category: string;
+  brand: string;
 };
 
 type ResultData = {
   titulo: string;
-  descripcion_corta: string;
-  descripcion_larga: string;
-  texto_instagram: string;
-  mensaje_whatsapp: string;
-  hashtags: string[];
+  descripcion: string;
+  caracteristicas: string[];
+  beneficios: string[];
+  info_adicional: string;
 };
 
 type HistoryItem = {
@@ -31,14 +34,17 @@ export default function Home() {
     audience: "",
     tone: "profesional",
     price: "",
+    details: "",
+    condition: "nuevo",
+    category: "",
+    brand: "",
   });
 
   const [result, setResult] = useState<ResultData | null>(null);
 
   const [history, setHistory] = useState<HistoryItem[]>(() => {
     if (typeof window === "undefined") return [];
-
-    const saved = localStorage.getItem("generation-history");
+    const saved = localStorage.getItem("ml-generation-history");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -54,13 +60,12 @@ export default function Home() {
     };
 
     const updatedHistory = [item, ...history].slice(0, 5);
-
     setHistory(updatedHistory);
-    localStorage.setItem("generation-history", JSON.stringify(updatedHistory));
+    localStorage.setItem("ml-generation-history", JSON.stringify(updatedHistory));
   }
 
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
     setForm({
       ...form,
@@ -70,12 +75,11 @@ export default function Home() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     setError("");
     setResult(null);
 
-    if (!form.product || !form.audience || !form.price) {
-      setError("Completá todos los campos.");
+    if (!form.product || !form.audience || !form.price || !form.details) {
+      setError("Completá producto, público objetivo, precio y detalles.");
       return;
     }
 
@@ -108,24 +112,24 @@ export default function Home() {
 
   function clearHistory() {
     setHistory([]);
-    localStorage.removeItem("generation-history");
+    localStorage.removeItem("ml-generation-history");
   }
 
   return (
     <main className="min-h-screen bg-zinc-950 text-white px-6 py-10">
       <section className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1fr] gap-10 items-start">
         <div>
-          <span className="inline-block mb-4 text-sm text-blue-400 font-medium">
-            Generador de ventas con IA
+          <span className="inline-block mb-4 text-sm text-yellow-400 font-medium">
+            Generador para MercadoLibre Argentina
           </span>
 
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-5">
-            Creá textos para vender productos en segundos
+            Creá publicaciones más precisas para vender mejor
           </h1>
 
           <p className="text-zinc-400 text-lg mb-8">
-            Ingresá tu producto, público, precio y tono. La IA genera título,
-            descripción, texto para Instagram, WhatsApp y hashtags.
+            Cargá los datos reales del producto y generá una publicación lista
+            para usar en MercadoLibre.
           </p>
 
           <form
@@ -137,7 +141,23 @@ export default function Home() {
               name="product"
               value={form.product}
               onChange={handleChange}
-              placeholder="Ej: Zapatillas urbanas"
+              placeholder="Ej: Auriculares Bluetooth"
+            />
+
+            <InputField
+              label="Marca"
+              name="brand"
+              value={form.brand}
+              onChange={handleChange}
+              placeholder="Ej: JBL, Samsung, Genérico"
+            />
+
+            <InputField
+              label="Categoría"
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+              placeholder="Ej: Tecnología, Indumentaria, Hogar"
             />
 
             <InputField
@@ -145,7 +165,7 @@ export default function Home() {
               name="audience"
               value={form.audience}
               onChange={handleChange}
-              placeholder="Ej: jóvenes de 18 a 25 años"
+              placeholder="Ej: personas que buscan auriculares cómodos para uso diario"
             />
 
             <InputField
@@ -153,23 +173,53 @@ export default function Home() {
               name="price"
               value={form.price}
               onChange={handleChange}
-              placeholder="Ej: $45.000"
+              placeholder="Ej: $25.000"
             />
 
             <div>
-              <label className="block mb-2 text-sm text-zinc-300">Tono</label>
+              <label className="block mb-2 text-sm text-zinc-300">Estado</label>
+              <select
+                name="condition"
+                value={form.condition}
+                onChange={handleChange}
+                className="w-full rounded-xl bg-zinc-950 border border-zinc-700 px-4 py-3 outline-none focus:border-yellow-500"
+              >
+                <option value="nuevo">Nuevo</option>
+                <option value="usado">Usado</option>
+                <option value="reacondicionado">Reacondicionado</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm text-zinc-300">
+                Tono de venta
+              </label>
               <select
                 name="tone"
                 value={form.tone}
                 onChange={handleChange}
-                className="w-full rounded-xl bg-zinc-950 border border-zinc-700 px-4 py-3 outline-none focus:border-blue-500"
+                className="w-full rounded-xl bg-zinc-950 border border-zinc-700 px-4 py-3 outline-none focus:border-yellow-500"
               >
                 <option value="profesional">Profesional</option>
-                <option value="juvenil">Juvenil</option>
-                <option value="elegante">Elegante</option>
-                <option value="divertido">Divertido</option>
-                <option value="urgente">Urgente</option>
+                <option value="directo">Directo</option>
+                <option value="confiable">Confiable</option>
+                <option value="premium">Premium</option>
+                <option value="simple">Simple</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-sm text-zinc-300">
+                Detalles reales del producto
+              </label>
+              <textarea
+                name="details"
+                value={form.details}
+                onChange={handleChange}
+                placeholder="Ej: color negro, batería hasta 8 horas, incluye cable USB, buen sonido, compatible con Android y iPhone"
+                rows={5}
+                className="w-full rounded-xl bg-zinc-950 border border-zinc-700 px-4 py-3 outline-none focus:border-yellow-500 resize-none"
+              />
             </div>
 
             {error && (
@@ -181,9 +231,9 @@ export default function Home() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-900 disabled:cursor-not-allowed transition rounded-xl py-3 font-semibold"
+              className="w-full bg-yellow-500 hover:bg-yellow-400 text-black disabled:bg-yellow-900 disabled:text-zinc-300 disabled:cursor-not-allowed transition rounded-xl py-3 font-semibold"
             >
-              {loading ? "Generando..." : "Generar contenido"}
+              {loading ? "Generando publicación..." : "Generar publicación"}
             </button>
           </form>
 
@@ -204,7 +254,7 @@ export default function Home() {
                   <button
                     key={item.id}
                     onClick={() => setResult(item.result)}
-                    className="w-full text-left bg-zinc-950 border border-zinc-800 hover:border-blue-500 rounded-xl p-3 transition"
+                    className="w-full text-left bg-zinc-950 border border-zinc-800 hover:border-yellow-500 rounded-xl p-3 transition"
                   >
                     <p className="font-medium">{item.product}</p>
                     <p className="text-sm text-zinc-500">{item.createdAt}</p>
@@ -218,18 +268,26 @@ export default function Home() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 min-h-[400px]">
           {!result && (
             <div className="h-full flex items-center justify-center text-zinc-500 text-center">
-              El resultado generado aparecerá acá.
+              La publicación generada aparecerá acá.
             </div>
           )}
 
           {result && (
             <div className="space-y-6">
-              <ResultBlock title="Título" content={result.titulo} />
-              <ResultBlock title="Descripción corta" content={result.descripcion_corta} />
-              <ResultBlock title="Descripción larga" content={result.descripcion_larga} />
-              <ResultBlock title="Instagram" content={result.texto_instagram} />
-              <ResultBlock title="WhatsApp" content={result.mensaje_whatsapp} />
-              <ResultBlock title="Hashtags" content={result.hashtags.join(" ")} />
+              <ResultBlock title="Título SEO" content={result.titulo} />
+              <ResultBlock title="Descripción" content={result.descripcion} />
+              <ResultBlock
+                title="Características"
+                content={result.caracteristicas.map((item) => `• ${item}`).join("\n")}
+              />
+              <ResultBlock
+                title="Beneficios"
+                content={result.beneficios.map((item) => `• ${item}`).join("\n")}
+              />
+              <ResultBlock
+                title="Información adicional"
+                content={result.info_adicional}
+              />
             </div>
           )}
         </div>
@@ -259,7 +317,7 @@ function InputField({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full rounded-xl bg-zinc-950 border border-zinc-700 px-4 py-3 outline-none focus:border-blue-500"
+        className="w-full rounded-xl bg-zinc-950 border border-zinc-700 px-4 py-3 outline-none focus:border-yellow-500"
       />
     </div>
   );
@@ -277,7 +335,7 @@ function ResultBlock({ title, content }: { title: string; content: string }) {
   return (
     <div className="border-b border-zinc-800 pb-5 last:border-b-0">
       <div className="flex items-center justify-between gap-4 mb-2">
-        <h2 className="text-sm uppercase tracking-wide text-blue-400">
+        <h2 className="text-sm uppercase tracking-wide text-yellow-400">
           {title}
         </h2>
 
